@@ -15,14 +15,16 @@ use Mockery\CountValidator\Exception;
 
 class DataController extends Controller
 {
-    
     public function getArticles(Request $request){
+        $evepagecnt = 5;
         try {
+            $page = $request->input('page');
+            if($page==null || $page=="") $page = 0;
             $catergoryid = $request->input('categoryid');
             $curcategory = Categorys::where('id','=',$catergoryid)->first();
             if($catergoryid == null)
-                $articles = Article::all();
-            else   $articles = Article::where('category','=',$catergoryid)->get();
+                $articles = Article::select('*')->skip($page*$evepagecnt)->take($evepagecnt)->get();
+            else   $articles = Article::where('category','=',$catergoryid)->skip($page*$evepagecnt)->take($evepagecnt)->get();
             foreach ($articles as $article) {
                 $id = $article->userid;
                 $username = User::where('id', '=', $id)->first()->name;
@@ -31,15 +33,24 @@ class DataController extends Controller
                 $article->category = $category;
             }
             $categorys = Categorys::all();
+            $path = config("app.url")."/articles?";
+
+            if($catergoryid!=null) {
+                $path.="categoryid=".$catergoryid;
+                $pagecnts = ceil(count(Article::where('category','=',$catergoryid)->get())/$evepagecnt);
+            }else $pagecnts = ceil(count(Article::all())/$evepagecnt);
             return view('articles/index')
                 ->with('articles',$articles)
                 ->with('categorys',$categorys)
-                ->with('curcategory',$curcategory);
+                ->with('curcategory',$curcategory)
+                ->with('curpage',$page)
+                ->with('evepagecnt',$evepagecnt)
+                ->with('pagecnts',$pagecnts)
+                ->with('path',$path);
         }catch (Exception $e){
             return view('errors/503');
         }
-
-
+        
     }
     
     public function getArticle(Request $request){
@@ -75,22 +86,34 @@ class DataController extends Controller
     }
 
     public function getUserArticles(Request $request){
+        $evepagecnt = 5;
         try {
+            $page=$request->input("page");
+            if($page==null || $page=="") $page=0;
             $categoryid = $request->input('categoryid');
             $userid = Auth::user()->id;
             if($categoryid==null)
-                $articles = Article::where('userid', '=', $userid)->get();
-            else $articles = Article::where('userid', '=', $userid)->where('category','=',$categoryid)->get();
+                $articles = Article::where('userid', '=', $userid)->skip($page*$evepagecnt)->take($evepagecnt)->get();
+            else $articles = Article::where('userid', '=', $userid)->where('category','=',$categoryid)->skip($page*$evepagecnt)->take($evepagecnt)->get();
             foreach ($articles as $art) {
                 $cat = Categorys::where('id', '=', $art->category)->first()->name;
                 $art->category = $cat;
             }
             $categorys = Categorys::select('name', 'id')->get();
-            if($categoryid!=null)$categoryid=Categorys::where('id','=',$categoryid)->first();
+            $path = config("app.url")."/updatearticle?";
+            if($categoryid!=null){
+                $path.="categoryid=".$categoryid;
+                $pagecnts = ceil(count(Article::where('category','=',$categoryid)->get())/$evepagecnt);
+                $categoryid=Categorys::where('id','=',$categoryid)->first();
+            }else $pagecnts = ceil(count(Article::where('userid', '=', $userid)->get())/$evepagecnt);
             return view('article/update')
                 ->with('articles', $articles)
                 ->with('categorys', $categorys)
-                ->with('curcategory',$categoryid);
+                ->with('curcategory',$categoryid)
+                ->with('curpage',$page)
+                ->with('pagecnts',$pagecnts)
+                ->with('evepagecnt',$evepagecnt)
+                ->with('path',$path);
         }catch (Exception $e){
             return view('errors/503');
         }
@@ -179,7 +202,6 @@ class DataController extends Controller
         }catch (Exception $ex){
             return "Update Failed";
         }
-//        return "ss";
     }
     
 }

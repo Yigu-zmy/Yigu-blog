@@ -8,6 +8,16 @@
     <meta name="csrf-token" content="{!! csrf_token() !!}"/>
     <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
 
+    <style>
+        body {
+            background: url() no-repeat center center fixed;
+         -webkit-background-size: cover;
+        -moz-background-size: cover;
+        -o-background-size: cover;
+        background-size: cover;
+            z-index: -1;
+        }
+    </style>
     @yield('css')
 
     <script src="//cdn.bootcss.com/jquery/1.11.3/jquery.min.js"></script>

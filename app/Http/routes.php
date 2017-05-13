@@ -16,7 +16,7 @@ Route::get('/', function () {
 });
 
 Route::get('/home', function () {
-    return view('home/index');
+    return view('about/index');
 });
 
 Route::get('/articles','Data\DataController@getArticles');

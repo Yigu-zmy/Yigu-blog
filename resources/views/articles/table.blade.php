@@ -16,7 +16,7 @@
                 @for($i = 0; $i < $count; $i++)
 
                     <tr onclick="location.href='/article?id={{$articles[$i]->id}}'">
-                        <td>{{$i+1}}</td>
+                        <td>{{$i+1+$curpage*$evepagecnt}}</td>
                         <td>{{$articles[$i]->title}}</td>
                         <td>{{$articles[$i]->category}}</td>
                         <td>{{$articles[$i]->username}}</td>
