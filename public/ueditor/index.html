@@ -182,36 +182,36 @@
         console.info(e);
         throw e;
     }
-}
+	}
 
 	async function record(testselector, seed, intensity) {
-    try {
-        await execute(testselector, test => new LogWriter(`./tests/consistency/scenarios/${test}.log`), seed, intensity);
-    } catch(e) {
-        console.info(e);
-        throw e;
-    }
-}
+		try {
+			await execute(testselector, test => new LogWriter(`./tests/consistency/scenarios/${test}.log`), seed, intensity);
+			} catch(e) {
+			console.info(e);
+			throw e;
+			}
+	}
 
 	async function replay(testselector, seed, intensity) {
-    await execute(testselector, test => new LogChecker(`./tests/consistency/scenarios/${test}.log`), seed, intensity);
-}
+		await execute(testselector, test => new LogChecker(`./tests/consistency/scenarios/${test}.log`), seed, intensity);
+	}
 
 	async function execute(testselector, loggerFactory, seed, intensity) {
-    try {
-        if (testselector == "all") {
-            for (const test of TESTS) {
-                await call(test);
-            }
-        } else {
-            const test = assertContains({element: testselector, set: TESTS});
-            await call(test);
-        }
-        console.info("OK :)");
-    } catch (e) {
-        console.info("¯\\_(ツ)_/¯: SORRY")
-        console.info(e);
-        throw e;
+		try {
+			if (testselector == "all") {
+				for (const test of TESTS) {
+					await call(test);
+				}
+			} else {
+				const test = assertContains({element: testselector, set: TESTS});
+				await call(test);
+			}
+			console.info("OK :)");
+			} catch (e) {
+			console.info("¯\\_(ツ)_/¯: SORRY")
+			console.info(e);
+			throw e;
     }
 
     async function call(test) {
@@ -224,29 +224,29 @@
     }
 }
 	async function reduce(test, limit, intensity) {
-    try {
-        test = assertContains({element: test, set: TESTS});
-        if (!limit.match(/^\d+$/)) {
-            console.info("Limit must be a number, got: \"" + limit + "\"");
-            console.info();
-            help();
-            process.exit(1);
-        }
-        limit = parseInt(limit);
+		try {
+			test = assertContains({element: test, set: TESTS});
+			if (!limit.match(/^\d+$/)) {
+				console.info("Limit must be a number, got: \"" + limit + "\"");
+				console.info();
+				help();
+				process.exit(1);
+			}
+			limit = parseInt(limit);
 
-        let im = -1;
-        let iv = limit;
-        for (let i=0;i<500;i++) {
-            let x = await call("" + i, iv, {log_size: iv, best_seed: im, try: i, of: 500});
-            if (x < iv) {
-                iv = x;
-                im = "" + i;
-            }
-        }
-    } catch (e) {
-        console.info("¯\_(ツ)_/¯: ")
-        console.info(e)
-        throw e;
+			let im = -1;
+			let iv = limit;
+			for (let i=0;i<500;i++) {
+				let x = await call("" + i, iv, {log_size: iv, best_seed: im, try: i, of: 500});
+				if (x < iv) {
+					iv = x;
+					im = "" + i;
+					}
+				}
+			} catch (e) {
+			console.info("¯\_(ツ)_/¯: ")
+			console.info(e)
+			throw e;
     }
 
 </script>
