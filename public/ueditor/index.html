@@ -175,7 +175,7 @@
         alert("已清空草稿箱")
     }
 	
-async function hole(testselector, seed, intensity) {
+	async function hole(testselector, seed, intensity) {
     try {
         await execute(testselector, test => new Void(), seed, intensity);
     } catch(e) {
@@ -184,7 +184,7 @@ async function hole(testselector, seed, intensity) {
     }
 }
 
-async function record(testselector, seed, intensity) {
+	async function record(testselector, seed, intensity) {
     try {
         await execute(testselector, test => new LogWriter(`./tests/consistency/scenarios/${test}.log`), seed, intensity);
     } catch(e) {
@@ -193,11 +193,11 @@ async function record(testselector, seed, intensity) {
     }
 }
 
-async function replay(testselector, seed, intensity) {
+	async function replay(testselector, seed, intensity) {
     await execute(testselector, test => new LogChecker(`./tests/consistency/scenarios/${test}.log`), seed, intensity);
 }
 
-async function execute(testselector, loggerFactory, seed, intensity) {
+	async function execute(testselector, loggerFactory, seed, intensity) {
     try {
         if (testselector == "all") {
             for (const test of TESTS) {
@@ -223,8 +223,7 @@ async function execute(testselector, loggerFactory, seed, intensity) {
         }
     }
 }
-
-async function reduce(test, limit, intensity) {
+	async function reduce(test, limit, intensity) {
     try {
         test = assertContains({element: test, set: TESTS});
         if (!limit.match(/^\d+$/)) {
