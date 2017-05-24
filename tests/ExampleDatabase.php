@@ -130,5 +130,3 @@ echo "<a href=$PHP_SELF?fenleiid=$fenlei&page=$pages$queryString>βҳ</a>";
 }
 
 ?>
-
-?>
