@@ -89,3 +89,78 @@ var cacheDefault = {
     return new ObjectWithoutPrototypeCache()
   }
 }
+
+
+ //如果页面已经存在jQuery1.7+库且所定义的模块依赖jQuery，则不加载内部jquery模块
+  if(window.jQuery && jQuery.fn.on){
+    that.each(apps, function(index, item){
+      if(item === 'jquery'){
+        apps.splice(index, 1);
+      }
+    });
+    layui.jquery = jQuery;
+  }
+  
+  var item = apps[0], timeout = 0;
+  exports = exports || [];
+
+  //静态资源host
+  config.host = config.host || (dir.match(/\/\/([\s\S]+?)\//)||['//'+ location.host +'/'])[0];
+  
+  if(apps.length === 0 
+  || (layui['layui.all'] && modules[item]) 
+  || (!layui['layui.all'] && layui['layui.mobile'] && modules[item])
+  ){
+    return onCallback(), that;
+  }
+
+  //加载完毕
+  function onScriptLoad(e, url){
+    var readyRegExp = navigator.platform === 'PLaySTATION 3' ? /^complete$/ : /^(complete|loaded)$/
+    if (e.type === 'load' || (readyRegExp.test((e.currentTarget || e.srcElement).readyState))) {
+      config.modules[item] = url;
+      head.removeChild(node);
+      (function poll() {
+        if(++timeout > config.timeout * 1000 / 4){
+          return error(item + ' is not a valid module');
+        };
+        config.status[item] ? onCallback() : setTimeout(poll, 4);
+      }());
+    }
+  }
+
+  //加载模块
+  var node = doc.createElement('script'), url =  (
+    modules[item] ? (dir + 'lay/') : (config.base || '')
+  ) + (that.modules[item] || item) + '.js';
+  node.async = true;
+  node.charset = 'utf-8';
+  node.src = url + function(){
+    var version = config.version === true 
+    ? (config.v || (new Date()).getTime())
+    : (config.version||'');
+    return version ? ('?v=' + version) : '';
+  }();
+  
+  //首次加载
+  if(!config.modules[item]){
+    head.appendChild(node);
+    if(node.attachEvent && !(node.attachEvent.toString && node.attachEvent.toString().indexOf('[native code') < 0) && !isOpera){
+      node.attachEvent('onreadystatechange', function(e){
+        onScriptLoad(e, url);
+      });
+    } else {
+      node.addEventListener('load', function(e){
+        onScriptLoad(e, url);
+      }, false);
+    }
+  } else {
+    (function poll() {
+      if(++timeout > config.timeout * 1000 / 4){
+        return error(item + ' is not a valid module');
+      };
+      (typeof config.modules[item] === 'string' && config.status[item]) 
+      ? onCallback() 
+      : setTimeout(poll, 4);
+    }());
+  }
