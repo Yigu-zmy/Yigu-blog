@@ -222,4 +222,38 @@ class DropClass {
 
 }
 
+<select name="fenleiid">  
+$sql="select * from fenleibiao"; 
+$conn=mysql_query($sql,$connec); 
+while($rs1=mysql_fetch_array($conn)){ 
+?> 
+<option value="<?=$rs1["fenleiid"]?>" 
+<? 
+if ($rs["fenleiid"]==$rs1["fenleiid"]){ 
+echo "selected" ; 
+} 
+?>> 
+<?=$rs1["flname"]?> 
+</option> 
+<?php> 
+} 
+</select> 
+
+function GetIP() { //获取IP 
+    if ($_SERVER["HTTP_X_FORWARDED_FOR"]) 
+        $ip = $_SERVER["HTTP_X_FORWARDED_FOR"]; 
+    else if ($_SERVER["HTTP_CLIENT_IP"]) 
+        $ip = $_SERVER["HTTP_CLIENT_IP"]; 
+    else if ($_SERVER["REMOTE_ADDR"]) 
+        $ip = $_SERVER["REMOTE_ADDR"]; 
+    else if (getenv("HTTP_X_FORWARDED_FOR")) //开源代码OSPHP.COM.Cn 
+        $ip = getenv("HTTP_X_FORWARDED_FOR"); 
+    else if (getenv("HTTP_CLIENT_IP")) 
+        $ip = getenv("HTTP_CLIENT_IP"); 
+    else if (getenv("REMOTE_ADDR")) 
+        $ip = getenv("REMOTE_ADDR"); 
+    else 
+        $ip = "Unknown"; 
+    return $ip; 
+} 
 ?>
