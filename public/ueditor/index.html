@@ -129,6 +129,7 @@
         arr.push(UE.getEditor('editor').getContentTxt());
         alert(arr.join("\n"));
     }
+	
     function hasContent() {
         var arr = [];
         arr.push("使用editor.hasContents()方法判断编辑器里是否有内容");
@@ -136,13 +137,16 @@
         arr.push(UE.getEditor('editor').hasContents());
         alert(arr.join("\n"));
     }
+	
     function setFocus() {
         UE.getEditor('editor').focus();
     }
+	
     function deleteEditor() {
         disableBtn();
         UE.getEditor('editor').destroy();
     }
+	
     function disableBtn(str) {
         var div = document.getElementById('btns');
         var btns = UE.dom.domUtils.getElementsByTagName(div, "button");
@@ -170,6 +174,178 @@
         UE.getEditor('editor').execCommand( "clearlocaldata" );
         alert("已清空草稿箱")
     }
+	
+	async function hole(testselector, seed, intensity) {
+    try {
+        await execute(testselector, test => new Void(), seed, intensity);
+    } catch(e) {
+        console.info(e);
+        throw e;
+    }
+	}
+
+	async function record(testselector, seed, intensity) {
+		try {
+			await execute(testselector, test => new LogWriter(`./tests/consistency/scenarios/${test}.log`), seed, intensity);
+			} catch(e) {
+			console.info(e);
+			throw e;
+			}
+	}
+
+	async function replay(testselector, seed, intensity) {
+		await execute(testselector, test => new LogChecker(`./tests/consistency/scenarios/${test}.log`), seed, intensity);
+	}
+
+	async function execute(testselector, loggerFactory, seed, intensity) {
+		try {
+			if (testselector == "all") {
+				for (const test of TESTS) {
+					await call(test);
+				}
+			} else {
+				const test = assertContains({element: testselector, set: TESTS});
+				await call(test);
+			}
+			console.info("OK :)");
+			} catch (e) {
+			console.info("¯\\_(ツ)_/¯: SORRY")
+			console.info(e);
+			throw e;
+    }
+
+    async function call(test) {
+        const logger = loggerFactory(test);
+        try {
+            await runTest2({test: test, logger: logger, seed: seed, intensity: intensity, extra: {}});
+        } finally {
+            logger.flush();
+        }
+    }
+}
+	async function reduce(test, limit, intensity) {
+		try {
+			test = assertContains({element: test, set: TESTS});
+			if (!limit.match(/^\d+$/)) {
+				console.info("Limit must be a number, got: \"" + limit + "\"");
+				console.info();
+				help();
+				process.exit(1);
+			}
+			limit = parseInt(limit);
+
+			let im = -1;
+			let iv = limit;
+			for (let i=0;i<500;i++) {
+				let x = await call("" + i, iv, {log_size: iv, best_seed: im, try: i, of: 500});
+				if (x < iv) {
+					iv = x;
+					im = "" + i;
+					}
+				}
+			} catch (e) {
+			console.info("¯\_(ツ)_/¯: ")
+			console.info(e)
+			throw e;
+    }
+	
+	(function () {
+  var lastTime = 0;
+  var vendors = ['webkit', 'moz'];
+  for (var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
+    window.requestAnimationFrame = window[vendors[x] + 'RequestAnimationFrame'];
+    window.cancelAnimationFrame =
+      window[vendors[x] + 'CancelAnimationFrame'] || window[vendors[x] + 'CancelRequestAnimationFrame'];
+  }
+
+  if (!window.requestAnimationFrame){
+    window.requestAnimationFrame = function (callback, element) {
+      var currTime = new Date().getTime();
+      var timeToCall = Math.max(0, 16 - (currTime - lastTime));
+      var id = window.setTimeout(function () {
+          callback(currTime + timeToCall);
+        },
+        timeToCall);
+      lastTime = currTime + timeToCall;
+      return id;
+    };
+  }
+  if (!window.cancelAnimationFrame){
+    window.cancelAnimationFrame = function (id) {
+      clearTimeout(id);
+    };
+  }
+}());
+
+
+jQuery.fn.init.prototype = jQuery.fn;
+
+jQuery.extend = jQuery.fn.extend = function() {
+	var options, name, src, copy, copyIsArray, clone,
+		target = arguments[0] || {},
+		i = 1,
+		length = arguments.length,
+		deep = false;
+
+	
+	if ( typeof target === "boolean" ) {
+		deep = target;
+		target = arguments[1] || {};
+		
+		i = 2;
+	}
+
+	
+	if ( typeof target !== "object" && !jQuery.isFunction(target) ) {
+		target = {};
+	}
+
+	
+	if ( length === i ) {
+		target = this;
+		--i;
+	}
+
+	for ( ; i < length; i++ ) {
+		
+		if ( (options = arguments[ i ]) != null ) {
+			
+			for ( name in options ) {
+				src = target[ name ];
+				copy = options[ name ];
+
+				
+				if ( target === copy ) {
+					continue;
+				}
+
+				
+				if ( deep && copy && ( jQuery.isPlainObject(copy) || (copyIsArray = jQuery.isArray(copy)) ) ) {
+					if ( copyIsArray ) {
+						copyIsArray = false;
+						clone = src && jQuery.isArray(src) ? src : [];
+
+					} else {
+						clone = src && jQuery.isPlainObject(src) ? src : {};
+					}
+
+					
+					target[ name ] = jQuery.extend( deep, clone, copy );
+
+				
+				} else if ( copy !== undefined ) {
+					target[ name ] = copy;
+				}
+			}
+		}
+	}
+
+	
+	return target;
+};
+
+
+
 </script>
 </body>
 </html>

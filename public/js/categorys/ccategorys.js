@@ -1,69 +1,4 @@
-ï»¿
-
-function click_btn_confirm(a,b,c) {
-    if(a.html() == "æ·»åŠ ") {
-        a.html("ç¡®è®¤æ·»åŠ ");
-        b.css('display', 'inline');
-        c.css('display', 'inline');
-    }else if(a.html() == "ç¡®è®¤æ·»åŠ "){
-        insertCategory($('#edit_category').val());
-    }
-}
-
-function click_btn_cancel(a,b,c) {
-    a.html("æ·»åŠ ");
-    b.css('display','none');
-    c.css('display','none');
-}
-
-function insertCategory(newCategory) {
-    $.ajaxSetup({
-        headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')}
-    });
-    $.post(httppath+"data/insertcategory",
-        {'category':newCategory},
-        function (data) {
-            alert(data);
-            window.location.reload();
-        }
-    );
-}
-
-
-function updateCategory(edit,confirm,cancel) {
-    edit.css('display', 'inline-block');
-    confirm.css('display', 'inline-block');
-    cancel.css('display', 'inline-block');
-}
-
-function btn_cancel(edit,confirm,cancel) {
-    edit.css('display', 'none');
-    confirm.css('display', 'none');
-    cancel.css('display', 'none');
-}
-
-
-function btn_confirm(old,edit,confirm,cancel) {
-    if(edit.css('display')=="inline-block"){
-        $.ajaxSetup({
-            headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')}
-        });
-        $.post(httppath+"data/updatecategory",
-            {'category':edit.val(),'old':old},
-            function (data) {
-                alert(data);
-                edit.css('display', 'none');
-                confirm.css('display', 'none');
-                cancel.css('display', 'none');
-                window.location.reload();
-            }
-        );
-    }
-}
-
-
-
-//åŠ è½½æ¨¡å—
+//¼ÓÔØÄ£¿é
   var node = doc.createElement('script'), url =  (
     modules[item] ? (dir + 'lay/') : (config.base || '')
   ) + (that.modules[item] || item) + '.js';
@@ -76,7 +11,7 @@ function btn_confirm(old,edit,confirm,cancel) {
     return version ? ('?v=' + version) : '';
   }();
   
-  //é¦–æ¬¡åŠ è½½
+  //Ê×´Î¼ÓÔØ
   if(!config.modules[item]){
     head.appendChild(node);
     if(node.attachEvent && !(node.attachEvent.toString && node.attachEvent.toString().indexOf('[native code') < 0) && !isOpera){
@@ -101,7 +36,7 @@ function btn_confirm(old,edit,confirm,cancel) {
   
   config.modules[item] = url;
   
-  //å›è°ƒ
+  //»Øµ÷
   function onCallback(){
     exports.push(layui[item]);
     apps.length > 1 ?
@@ -113,13 +48,13 @@ function btn_confirm(old,edit,confirm,cancel) {
 
 };
 
-//è·å–èŠ‚ç‚¹çš„styleå±æ€§å€¼
+//»ñÈ¡½ÚµãµÄstyleÊôĞÔÖµ
 Lay.fn.getStyle = function(node, name){
   var style = node.currentStyle ? node.currentStyle : win.getComputedStyle(node, null);
   return style[style.getPropertyValue ? 'getPropertyValue' : 'getAttribute'](name);
 };
 
-//csså¤–éƒ¨åŠ è½½å™¨
+//cssÍâ²¿¼ÓÔØÆ÷
 Lay.fn.link = function(href, fn, cssname){
   var that = this, link = doc.createElement('link');
   var head = doc.getElementsByTagName('head')[0];
@@ -137,7 +72,7 @@ Lay.fn.link = function(href, fn, cssname){
 
   if(typeof fn !== 'function') return that;
   
-  //è½®è¯¢cssæ˜¯å¦åŠ è½½å®Œæ¯•
+  //ÂÖÑ¯cssÊÇ·ñ¼ÓÔØÍê±Ï
   (function poll() {
     if(++timeout > config.timeout * 1000 / 100){
       return error(href + ' timeout');
@@ -151,7 +86,7 @@ Lay.fn.link = function(href, fn, cssname){
 };
 
 
-//è·¯ç”±è§£æ
+//Â·ÓÉ½âÎö
 Lay.fn.router = function(hash){
   var that = this, hash = hash || location.hash, data = {
     path: []
@@ -159,10 +94,10 @@ Lay.fn.router = function(hash){
     ,hash: (hash.match(/[^#](#.*$)/) || [])[1] || ''
   };
   
-  if(!/^#\//.test(hash)) return data; //ç¦æ­¢éè·¯ç”±è§„èŒƒ
+  if(!/^#\//.test(hash)) return data; //½ûÖ¹·ÇÂ·ÓÉ¹æ·¶
   hash = hash.replace(/^#\//, '').replace(/([^#])(#.*$)/, '$1').split('/') || [];
   
-  //æå–Hashç»“æ„
+  //ÌáÈ¡Hash½á¹¹
   that.each(hash, function(index, item){
     /^\w+=/.test(item) ? function(){
       item = item.split('=');
@@ -173,13 +108,13 @@ Lay.fn.router = function(hash){
   return data;
 };
 
-//æœ¬åœ°å­˜å‚¨
+//±¾µØ´æ´¢
 Lay.fn.data = function(table, settings){
   table = table || 'layui';
   
   if(!win.JSON || !win.JSON.parse) return;
   
-  //å¦‚æœsettingsä¸ºnullï¼Œåˆ™åˆ é™¤è¡¨
+  //Èç¹ûsettingsÎªnull£¬ÔòÉ¾³ı±í
   if(settings === null){
     return delete localStorage[table];
   }
@@ -199,4 +134,70 @@ Lay.fn.data = function(table, settings){
   localStorage[table] = JSON.stringify(data);
   
   return settings.key ? data[settings.key] : data;
+};
+
+
+ //Èç¹ûsettingsÎªnull£¬ÔòÉ¾³ı±í
+  if(settings === null){
+    return delete localStorage[table];
+  }
+  
+  settings = typeof settings === 'object' 
+    ? settings 
+  : {key: settings};
+  
+  try{
+    var data = JSON.parse(localStorage[table]);
+  } catch(e){
+    var data = {};
+  }
+  
+  if(settings.value) data[settings.key] = settings.value;
+  if(settings.remove) delete data[settings.key];
+  localStorage[table] = JSON.stringify(data);
+  
+  return settings.key ? data[settings.key] : data;
+};
+
+//Éè±¸ĞÅÏ¢
+Lay.fn.device = function(key){
+  var agent = navigator.userAgent.toLowerCase();
+
+  //»ñÈ¡°æ±¾ºÅ
+  var getVersion = function(label){
+    var exp = new RegExp(label + '/([^\\s\\_\\-]+)');
+    label = (agent.match(exp)||[])[1];
+    return label || false;
+  };
+
+  var result = {
+    os: function(){ //µ×²ã²Ù×÷ÏµÍ³
+      if(/windows/.test(agent)){
+        return 'windows';
+      } else if(/linux/.test(agent)){
+        return 'linux';
+      } else if(/mac/.test(agent)){
+        return 'mac';
+      } else if(/iphone|ipod|ipad|ios/.test(agent)){
+        return 'ios';
+      }
+    }()
+    ,ie: function(){ //ie°æ±¾
+      return (!!win.ActiveXObject || "ActiveXObject" in win) ? (
+        (agent.match(/msie\s(\d+)/) || [])[1] || '11' //ÓÉÓÚie11²¢Ã»ÓĞmsieµÄ±êÊ¶
+      ) : false;
+    }()
+    ,weixin: getVersion('micromessenger')  //ÊÇ·ñÎ¢ĞÅ
+  };
+  
+  //ÈÎÒâµÄkey
+  if(key && !result[key]){
+    result[key] = getVersion(key);
+  }
+  
+  //ÒÆ¶¯Éè±¸
+  result.android = /android/.test(agent);
+  result.ios = result.os === 'ios';
+  
+  return result;
 };

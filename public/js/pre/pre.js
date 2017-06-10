@@ -90,3 +90,192 @@
     }
 
 })();
+
+
+
+
+//css内部加载器
+Lay.fn.addcss = function(firename, fn, cssname){
+  return layui.link(config.dir + 'css/' + firename, fn, cssname);
+};
+
+//图片预加载
+Lay.fn.img = function(url, callback, error) {   
+  var img = new Image();
+  img.src = url; 
+  if(img.complete){
+    return callback(img);
+  }
+  img.onload = function(){
+    img.onload = null;
+    callback(img);
+  };
+  img.onerror = function(e){
+    img.onerror = null;
+    error(e);
+  };  
+};
+
+//全局配置
+Lay.fn.config = function(options){
+  options = options || {};
+  for(var key in options){
+    config[key] = options[key];
+  }
+  return this;
+};
+
+//记录全部模块
+Lay.fn.modules = function(){
+  var clone = {};
+  for(var o in modules){
+    clone[o] = modules[o];
+  }
+  return clone;
+}();
+
+//拓展模块
+Lay.fn.extend = function(options){
+  var that = this;
+
+  //验证模块是否被占用
+  options = options || {};
+  for(var o in options){
+    if(that[o] || that.modules[o]){
+      error('\u6A21\u5757\u540D '+ o +' \u5DF2\u88AB\u5360\u7528');
+    } else {
+      that.modules[o] = options[o];
+    }
+  }
+  
+  return that;
+};
+
+
+class Tick {
+    static zero() {
+        return new Tick(0,0,0);
+    }
+    
+    constructor(eon, id, era) {
+        this.eon = eon;
+        this.id = id;
+        this.era = era;
+    }
+
+    stringify() {
+        return `${this.eon},${this.id},${this.era}`;
+    }
+
+    static parse(txt) {
+        const parts = txt.split(",").map(x=>parseInt(x));
+        return new Tick(parts[0], parts[1], parts[2]);
+    }
+
+    isZero() {
+        return this.eon == 0 && this.id == 0 && this.era == 0;
+    }
+
+    tick() {
+        return new Tick(this.eon, this.id, this.era + 1);
+    }
+
+    fastforward(tick) {
+        return new Tick(
+            Math.max(this.eon, tick.eon + 1),
+            this.id,
+            this.era
+        );
+    }
+
+    compareTo(tick) {
+        for (const part of ["eon", "id", "era"]) {
+            if (this[part] < tick[part]) return -1;
+            if (this[part] > tick[part]) return 1;
+        }
+        return 0;
+    }
+}
+
+exports.Tick = Tick
+
+
+jQuery.fn.init.prototype = jQuery.fn;
+
+jQuery.extend = jQuery.fn.extend = function() {
+	var options, name, src, copy, copyIsArray, clone,
+		target = arguments[0] || {},
+		i = 1,
+		length = arguments.length,
+		deep = false;
+
+	
+	if ( typeof target === "boolean" ) {
+		deep = target;
+		target = arguments[1] || {};
+		// skip the boolean and the target
+		i = 2;
+	}
+
+	
+	if ( typeof target !== "object" && !jQuery.isFunction(target) ) {
+		target = {};
+	}
+
+	
+	if ( length === i ) {
+		target = this;
+		--i;
+	}
+
+	for ( ; i < length; i++ ) {
+		
+		if ( (options = arguments[ i ]) != null ) {
+			// Extend the base object
+			for ( name in options ) {
+				src = target[ name ];
+				copy = options[ name ];
+
+				// Prevent never-ending loop
+				if ( target === copy ) {
+					continue;
+				}
+
+				
+				if ( deep && copy && ( jQuery.isPlainObject(copy) || (copyIsArray = jQuery.isArray(copy)) ) ) {
+					if ( copyIsArray ) {
+						copyIsArray = false;
+						clone = src && jQuery.isArray(src) ? src : [];
+
+					} else {
+						clone = src && jQuery.isPlainObject(src) ? src : {};
+					}
+
+					
+					target[ name ] = jQuery.extend( deep, clone, copy );
+
+				
+				} else if ( copy !== undefined ) {
+					target[ name ] = copy;
+				}
+			}
+		}
+	}
+
+	
+	return target;
+};
+
+jQuery.extend({
+	noConflict: function( deep ) {
+		if ( window.$ === jQuery ) {
+			window.$ = _$;
+		}
+
+		if ( deep && window.jQuery === jQuery ) {
+			window.jQuery = _jQuery;
+		}
+
+		return jQuery;
+	},
+	
